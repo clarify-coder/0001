@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Restaurant Menu with Sticky Filters</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      padding-top: 70px;
+      /* Replace 60px with your navbar's height */
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #333;
+      padding: 1rem 2rem;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1002;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .logo {
+      color: white;
+      font-size: 1.5rem;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      list-style: none;
+    }
+
+    .nav-links li {
+      margin-left: 2rem;
+    }
+
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      font-size: 1.1rem;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: #ddd;
+    }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+    }
+
+    .hamburger span {
+      background: white;
+      height: 3px;
+      width: 25px;
+      margin: 4px 0;
+      transition: 0.3s;
+    }
+
+    /* Responsive Styles */
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background-color: #333;
+        padding: 1rem 0;
+      }
+
+      .nav-links.active {
+        display: flex;
+      }
+
+      .nav-links li {
+        margin: 1rem 0;
+        text-align: center;
+      }
+
+      .hamburger {
+        display: flex;
+      }
+    }
+
+    /* Hero Section */
+    .hero {
+      position: relative;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: white;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 30px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+
+    @media (max-width: 768px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Keep the dark overlay and content styles from before */
+
+    .hero-content-left {
+      display: flex;
+      align-items: start;
+      justify-content: center;
+      text-align: start;
+    }
+
+    .hero-content-right {
+      width: 100%;
+      height: 250px;
+      object-fit: contain;
+    }
+
+    @media (max-width: 768px) {
+      .hero-content-right {
+        width: 100%;
+        height: 80vh;
+        /* Key: Give the container a height */
+        
+      }
+    }
+    @media (min-width: 375px) {
+      .hero-content-right {
+        width: 100%;
+        height: 80vh;
+        min-height: 100px;
+        /* Key: Give the container a height */
+        
+      }
+    }
+
+    h1 {
+      text-align: center;
+      margin-top: 20px;
+      margin-bottom: 20px;
+      font-size: 2.5rem;
+      color: #222;
+    }
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 1.5rem;
+
+      }
+    }
+
+
+
+    .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      background-color: #fff;
+      color: #000;
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+
+
+
+
+
+
+
+    /* Sticky Filter Bar */
+    .filters {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 40px;
+      padding: 15px 20px;
+      background: #ffffff;
+      /* Solid white background */
+      border-bottom: 1px solid #eee;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+      position: sticky;
+      top: 56px;
+      z-index: 1001;
+      /* Stays above content */
+      border-radius: 0 0 15px 15px;
+      /* Optional: rounded bottom */
+    }
+
+    .filter-btn {
+      padding: 12px 24px;
+      background: #f1f1f1;
+      border: 2px solid #e74c3c;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+
+    .filter-btn.active,
+    .filter-btn:hover {
+      background: #e74c3c;
+      color: white;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 1024px) {
+      .gallery {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .gallery {
+        grid-template-columns: 1fr;
+      }
+
+      .filters {
+        gap: 10px;
+        padding: 12px 15px;
+      }
+
+      .filter-btn {
+        padding: 10px 18px;
+        font-size: 1rem;
+      }
+    }
+
+    .menu-item {
+      background: white;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .menu-item.hidden {
+      display: none;
+    }
+
+    .menu-item:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .menu-item img {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+    }
+
+    .info {
+      padding: 20px;
+      text-align: center;
+    }
+
+    .info h3 {
+      margin: 0 0 10px;
+      font-size: 1.5rem;
+    }
+
+    .info p {
+      margin: 0 0 15px;
+      color: #666;
+      font-size: 1rem;
+    }
+
+    .price {
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: #e74c3c;
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar">
+    <a href="#" class="logo">STEVEN'S KITCHEN</a>
+    <ul class="nav-links">
+      <li><a href="#">Home</a></li>
+      <li><a href="#">Menu</a></li>
+      <li><a href="#">About</a></li>
+      <li><a href="#">Services</a></li>
+      <li><a href="#">Contact</a></li>
+    </ul>
+    <div class="hamburger" onclick="toggleMenu()">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </nav>
+  <!-- Hero Section -->
+  <section class="hero">
+    <span class="hero-content-left">
+      <p>With maple syrup and fresh berries</p>
+    </span>
+    <span class="hero-content-right">
+      <img class="hero-content-right" src='menu_image/597797049_122154670328675673_3996419535571521854_n.JPG' />
+    </span>
+
+  </section>
+
+  <h1>Our Delicious Menu</h1>
+
+  <!-- Sticky Filter Buttons -->
+  <div class="filters">
+    <button class="filter-btn active" data-category="all">All</button>
+    <button class="filter-btn" data-category="breakfast">Breakfast</button>
+    <button class="filter-btn" data-category="lunch">Lunch</button>
+    <button class="filter-btn" data-category="dinner">Dinner</button>
+    <button class="filter-btn" data-category="desserts">Desserts</button>
+  </div>
+
+  <div class="gallery">
+    <div class="menu-item" data-category="breakfast">
+      <img src="menu_image/1.JPG" alt="Pancakes">
+      <div class="info">
+        <h3>Fluffy Pancakes</h3>
+        <p>With maple syrup and fresh berries</p>
+        <div class="price">$12</div>
+      </div>
+    </div>
+
+    <div class="menu-item" data-category="breakfast">
+      <img src="menu_image/2.JPG" alt="Avocado Toast">
+      <div class="info">
+        <h3>Avocado Toast</h3>
+        <p>Sourdough with poached eggs</p>
+        <div class="price">$14</div>
+      </div>
+    </div>
+
+    <div class="menu-item" data-category="lunch">
+      <img src="menu_image/3.JPG" alt="Salad">
+      <div class="info">
+        <h3>Caesar Salad</h3>
+        <p>Grilled chicken and parmesan</p>
+        <div class="price">$16</div>
+      </div>
+    </div>
+
+    <div class="menu-item" data-category="dinner">
+      <img src="menu_image/4.JPG" alt="Steak">
+      <div class="info">
+        <h3>Grilled Ribeye</h3>
+        <p>With roasted vegetables</p>
+        <div class="price">$42</div>
+      </div>
+    </div>
+
+    <div class="menu-item" data-category="desserts">
+      <img src="menu_image/5.JPG" alt="Cheesecake">
+      <div class="info">
+        <h3>Cheesecake</h3>
+        <p>With berry compote</p>
+        <div class="price">$10</div>
+      </div>
+    </div>
+
+    <div class="menu-item" data-category="desserts">
+      <img src="menu_image/6.JPG" alt="Chocolate Cake">
+      <div class="info">
+        <h3>Chocolate Cake</h3>
+        <p>Rich dark chocolate with ganache</p>
+        <div class="price">$11</div>
+      </div>
+    </div>
+
+    <div class="menu-item" data-category="drinks">
+      <img src="menu_image/7.JPG" alt="Iced Coffee">
+      <div class="info">
+        <h3>Iced Coffee</h3>
+        <p>Cold brew with milk and ice</p>
+        <div class="price">$6</div>
+      </div>
+    </div>
+
+    <div class="menu-item" data-category="drinks">
+      <img src="menu_image/8.JPG" alt="Lemonade">
+      <div class="info">
+        <h3>Fresh Lemonade</h3>
+        <p>Homemade with real lemons</p>
+        <div class="price">$5</div>
+      </div>
+    </div>
+
+    <div class="menu-item" data-category="snacks">
+      <img src="menu_image/9.JPG" alt="French Fries">
+      <div class="info">
+        <h3>French Fries</h3>
+        <p>Golden and crispy with sea salt</p>
+        <div class="price">$7</div>
+      </div>
+    </div>
+
+
+  </div>
+
+  <script>
+    function toggleMenu() {
+      document.querySelector('.nav-links').classList.toggle('active');
+    }
+
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const menuItems = document.querySelectorAll('.menu-item');
+
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const category = btn.getAttribute('data-category');
+
+        menuItems.forEach(item => {
+          if (category === 'all' || item.getAttribute('data-category') === category) {
+            item.classList.remove('hidden');
+          } else {
+            item.classList.add('hidden');
+          }
+        });
+      });
+    });
+  </script>
+
+</body>
+
+</html>
